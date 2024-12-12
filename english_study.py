@@ -1,4 +1,5 @@
 import sqlite3
+import random
 
 connection = sqlite3.connect("words.db")
 cursor = connection.cursor()
@@ -12,8 +13,11 @@ CREATE TABLE IF NOT EXISTS sozluk (
 )
 """)
 connection.commit()
+
+s = 0
+kontrol = 0
 def menu():
-    #naber lan tırrek
+    
     print("Yapmak istediginiz islemi secin...")
 
     secim = int(input("1-Kelime ekle 2-Kelime ara 3-Kelime Sil 4-Sinav Oyunu 0-Cikis \n"))
@@ -26,6 +30,10 @@ def menu():
         exit()
     if secim == 3:
         sil()
+    if secim == 4:
+        global s
+        s = int(input("Soru sayisini belirleyin: "))
+        oyun(s) 
     
 
 def ekle():
@@ -59,6 +67,36 @@ def sil():
     print(f"{s} kelimesi silindi")
     menu()
 
+def oyun(s):
+    print(s)
+    cursor.execute("SELECT id FROM sozluk ORDER BY id DESC LIMIT 1")
+    sonuc = cursor.fetchone()
+    sonuc = int(sonuc[0])
+    r = 0
+    while True:
+        r = random.randint(1,sonuc)
+        cursor.execute(f"select ingilizce from sozluk where id = ?",(r,))
+        ing = cursor.fetchone()
+        if ing:
+            print(ing[0])
+            break
+        else:
+            continue
+    cursor.execute("select turkce from sozluk where id = ?", (r,))
+    k = cursor.fetchone()
+    c = input("Cevabi girin: ")
+    if c == k[0]:
+        print("Dogru")
+        global kontrol
+        kontrol +=1
+    else:
+        print("yanlis")
+    if s != 1:
+        s -=1
+        oyun(s)
+    print(f"Dogru sayisi {kontrol}")
+    
+    menu()
 
 
 
