@@ -16,6 +16,7 @@ connection.commit()
 
 s = 0
 kontrol = 0
+sorular = [0]
 def menu():
     
     print("Yapmak istediginiz islemi secin...")
@@ -39,8 +40,11 @@ def menu():
 def ekle():
     
     ing = input("İngilizcesini gir: ")
+    ing = ing.lower()
     tur = input("Turkcesini gir: ")
+    tur = tur.lower()
     tel = input("Telafuz girin: ")
+    tel = tel.lower()
     sev = int(input("Kelime seviyesini gir: "))
     sql = f"INSERT INTO sozluk(ingilizce,turkce,telafuz,seviye) VALUES('{ing}','{tur}','{tel}',{sev})"
     cursor.execute(sql)
@@ -48,16 +52,24 @@ def ekle():
     menu()
 
 def ara():
-    s = int(input("İngilizce ise 1 - Turkce ise 2"))
+    s = int(input("İngilizce ise 1 - Turkce ise 2 \n"))
     k = input("Kelimeyi gir: ")
+    k = k.lower()
     if s == 1:
-        cursor.execute(f"select * from sozluk where ingilizce = '{k}'")
+        cursor.execute(f"select turkce,telafuz from sozluk where ingilizce = '{k}'")
         sonuc = cursor.fetchall()
-        print(sonuc)
+        if sonuc:
+            print(f"Turkce: {sonuc[0][0]} Telafuz: {sonuc[0][1]}")
+        else:
+            print("Bulunamadi...")
     elif s == 2:
-        cursor.execute(f"select * from sozluk where turkce = '{k}'")
+        cursor.execute(f"select ingilizce,telafuz from sozluk where turkce = '{k}'")
         sonuc = cursor.fetchall()
-        print(sonuc)
+        if sonuc:
+            print(f"Turkce: {sonuc[0][0]} Telafuz: {sonuc[0][1]}")
+        else:
+            print("Bulunamadi")
+
     menu()
 
 def sil():
@@ -74,7 +86,11 @@ def oyun(s):
     sonuc = int(sonuc[0])
     r = 0
     while True:
+
         r = random.randint(1,sonuc)
+        if r in sorular:
+            continue
+        sorular.append(r)
         cursor.execute(f"select ingilizce from sozluk where id = ?",(r,))
         ing = cursor.fetchone()
         if ing:
@@ -85,6 +101,7 @@ def oyun(s):
     cursor.execute("select turkce from sozluk where id = ?", (r,))
     k = cursor.fetchone()
     c = input("Cevabi girin: ")
+    c.lower()
     if c == k[0]:
         print("Dogru")
         global kontrol
