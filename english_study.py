@@ -16,12 +16,17 @@ def menu():
     #naber lan tırrek
     print("Yapmak istediginiz islemi secin...")
 
-    secim = int(input("1-Kelime ekle 2-Kelime ara 3-Kelime Sil 4-Sinav Oyunu 0-Cikis"))
+    secim = int(input("1-Kelime ekle 2-Kelime ara 3-Kelime Sil 4-Sinav Oyunu 0-Cikis \n"))
 
     if secim == 1:
         ekle()
     if secim == 2:
         ara()
+    if secim == 0:
+        exit()
+    if secim == 3:
+        sil()
+    
 
 def ekle():
     
@@ -46,6 +51,16 @@ def ara():
         sonuc = cursor.fetchall()
         print(sonuc)
     menu()
+
+def sil():
+    s = input("Silmek istediginiz ingilizce kelimeyi girin: ")
+    cursor.execute("delete from sozluk where ingilizce = ?",(s,))
+    connection.commit()
+    print(f"{s} kelimesi silindi")
+    menu()
+
+
+
 
 menu()
 cursor.close()
